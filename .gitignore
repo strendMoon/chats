@@ -1,0 +1,23 @@
+# Зависимости (скачиваются через npm install / yarn)
+node_modules/
+jspm_packages/
+__pycache__/
+venv/
+.vscode/
+
+# Папки сборки (билды)
+dist/
+build/
+.next/
+out/
+
+# Логи ошибок
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Конфиденциальные данные (ключи, пароли)
+.env
+.env.local
+.env.production
