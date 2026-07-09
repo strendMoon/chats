@@ -1,10 +1,12 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useAppStore } from '@/stores/appStore'
+
+import { YoutubeChat, TwitchChat, VkliveChat} from './widgets/chats/chats_import.js'
+
 const theme = ref('dark')
 const sidebarCollapsed = ref(false)
 const selectedPage = ref('chats')
-const mergedView = ref(false)
 const store = useAppStore()
 
 const pages = [
@@ -12,66 +14,10 @@ const pages = [
   { id: 'alerts', label: 'Оповещения', icon: '🔔', hint: 'Уведомления' },
   { id: 'stats', label: 'Статистика', icon: '📊', hint: 'Аналитика' }
 ]
-
-const widgets = ref([
-  {
-    id: 1,
-    title: 'VK Live',
-    service: 'vk',
-    accentClass: 'accent-vk',
-    messages: [
-      { id: 1, text: 'Пользователь задал вопрос о новом стриме.' },
-      { id: 2, text: 'Новый комментарий пришёл из сообщества.' }
-    ]
-  },
-  {
-    id: 2,
-    title: 'YouTube',
-    service: 'youtube',
-    accentClass: 'accent-youtube',
-    messages: [
-      { id: 3, text: 'Подписчик оставил благодарность за видео.' },
-      { id: 4, text: 'Появился новый комментарий из прямой трансляции.' }
-    ]
-  },
-  {
-    id: 3,
-    title: 'Twitch',
-    service: 'twitch',
-    accentClass: 'accent-twitch',
-    messages: [
-      { id: 5, text: 'Быстрый ответ в чат для активной аудитории.' },
-      { id: 6, text: 'Пользователь отправил эмодзи и реакцию.' }
-    ]
-  }
-])
-
+console.log(YoutubeChat)
 const removedWidgets = ref([])
-
-const activeWidgets = computed(() => widgets.value)
 const currentPage = computed(() => pages.find((page) => page.id === selectedPage.value))
 
-const mergedMessages = computed(() =>
-  activeWidgets.value.flatMap((widget) =>
-    widget.messages.map((message) => ({ ...message, source: widget.title }))
-  )
-)
-
-const visibleWidgets = computed(() => {
-  if (!mergedView.value) {
-    return activeWidgets.value
-  }
-
-  return [
-    {
-      id: 'combined',
-      title: 'Объединённое окно',
-      service: 'combined',
-      accentClass: 'accent-combined',
-      messages: mergedMessages.value
-    }
-  ]
-})
 
 const toggleTheme = () => {
   theme.value = theme.value === 'dark' ? 'light' : 'dark'
@@ -91,37 +37,6 @@ const selectPage = (pageId) => {
 
 const toggleMerge = () => {
   mergedView.value = !mergedView.value
-}
-
-const removeWidget = (widgetId) => {
-  const index = widgets.value.findIndex((widget) => widget.id === widgetId)
-
-  if (index === -1) {
-    return
-  }
-
-  const [removed] = widgets.value.splice(index, 1)
-  removedWidgets.value.push(removed)
-}
-
-const restoreWidget = (widgetId) => {
-  const index = removedWidgets.value.findIndex((widget) => widget.id === widgetId)
-
-  if (index === -1) {
-    return
-  }
-
-  const [restored] = removedWidgets.value.splice(index, 1)
-  widgets.value.push(restored)
-}
-
-const restoreAll = () => {
-  if (!removedWidgets.value.length) {
-    return
-  }
-
-  widgets.value.push(...removedWidgets.value)
-  removedWidgets.value = []
 }
 </script>
 
@@ -170,54 +85,13 @@ const restoreAll = () => {
               Темная
             </button>
           </div>
-
-          <button class="action-btn" @click="toggleMerge">
-            {{ mergedView ? 'Разделить окна' : 'Объединить в одно' }}
-          </button>
         </div>
       </header>
 
       <section class="content-grid">
         <div class="chat-area">
-          <div class="window-toolbar">
-            <div>
-              <p class="toolbar-title">Центральная область</p>
-              <p class="toolbar-subtitle">Окна можно удалять и возвращать из правой панели.</p>
-            </div>
-            <button v-if="removedWidgets.length" class="ghost-btn" @click="restoreAll">
-              Вернуть всё
-            </button>
-          </div>
-
-          <div class="chat-grid" :class="{ merged: mergedView }">
-            <article
-              v-for="widget in visibleWidgets"
-              :key="widget.id"
-              class="chat-card"
-              :class="[widget.accentClass, { merged: mergedView }]"
-            >
-              <div class="chat-card-header">
-                <div>
-                  <p class="card-service">{{ mergedView ? 'Объединённое окно' : widget.service }}</p>
-                  <h3>{{ mergedView ? 'Все сообщения в одном окне' : widget.title }}</h3>
-                </div>
-                <button
-                  v-if="!mergedView"
-                  class="close-btn"
-                  @click="removeWidget(widget.id)"
-                  aria-label="Удалить окно"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div class="chat-body">
-                <div v-for="message in widget.messages" :key="message.id" class="message-row">
-                  <span class="message-source">{{ mergedView ? message.source : widget.title }}</span>
-                  <p>{{ message.text }}</p>
-                </div>
-              </div>
-            </article>
+          <div class="chat-grid">
+            <YoutubeChat />
           </div>
         </div>
 
