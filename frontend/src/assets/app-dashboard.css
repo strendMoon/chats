@@ -113,6 +113,15 @@
   background: transparent;
   color: var(--text);
   text-align: left;
+  transition: background 0.2s ease;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+}
+
+.page-btn:hover {
+  background: #4caf4f8c;
+  color: white;
 }
 
 .page-btn.active {
