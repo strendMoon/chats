@@ -1,19 +1,20 @@
 <script setup>
+import {computed } from 'vue';
 import { useAppStore } from '@/stores/index.js';
 import { storeToRefs } from 'pinia';
 
-import { YoutubeChat, TwitchChat, VkliveChat } from './widgets/chats/chats_import.js';
+import { pageComponents } from './pages/index.js';
 import NavPannel from './navigation/NavPannel.vue';
 import TopBar from './navigation/TopBar.vue';
 
 const store = useAppStore();
-const { theme, sidebarCollapsed } = storeToRefs(store);
+const { theme, sidebarCollapsed, buttons} = storeToRefs(store);
 const { toggleSidebar, setTheme } = store;
 
 const toggleTheme = () => {
   store.toggleTheme();
 };
-
+const currentPageId = computed(() => buttons.value.currentPage);
 </script>
 
 <template>
@@ -31,12 +32,13 @@ const toggleTheme = () => {
     <main class="workspace">
       <TopBar />
       <section class="content-grid">
-        <div class="chat-area">
-          <div class="chat-grid">
-            <YoutubeChat />
+          <div class="chat-area">
+            <div class="chat-grid">
+                <div v-if="!pageComponents[currentPageId]">Нет компонента для страницы {{ currentPageId }}</div>
+                <component v-else :is="pageComponents[currentPageId]" />
+            </div>
           </div>
-        </div>
-        <aside class="restore-panel">
+        <!-- <aside class="restore-panel">
           <h3>Удалённые окна</h3>
           <p class="restore-help">Возвращайте любое окно обратно в список чатов.</p>
           <div class="restore-list">
@@ -51,7 +53,7 @@ const toggleTheme = () => {
           <div class="restore-empty">
             Список пуст. Удалите окно, чтобы оно появилось здесь.
           </div>
-        </aside>
+        </aside> -->
       </section>
     </main>
   </div>
