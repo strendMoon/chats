@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-
+import {pages_config} from '../pages/index.js'
 export const useAppStore = defineStore('appState', {
   state: () => ({
     buttons: {
@@ -10,13 +10,11 @@ export const useAppStore = defineStore('appState', {
     sidebarCollapsed: false,
   }),
   getters: {
+    pages() {
+      return pages_config;
+    },
     currentPageObject(state) {
-    const pages = [
-      { id: 'chats', label: 'Чаты', icon: '💬', router_link: '/chats' },
-      { id: 'alerts', label: 'Оповещения', icon: '🔔', router_link: '/alerts' },
-      { id: 'stats', label: 'Статистика', icon: '📊', router_link: '/statistics' },
-      { id: 'home', label: 'Workspace', icon: '🏠', router_link: '/' },
-    ];
+      const pages = this.pages;
       return pages.find(p => p.id === state.buttons.currentPage) || pages[0];
     },
     currentPageLabel(state) {

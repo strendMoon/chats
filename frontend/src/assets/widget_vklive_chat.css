@@ -1,0 +1,308 @@
+.vklive-chat-widget {
+  --vk-bg: #1e1e2e;
+  --vk-text: #e4e4f0;
+  --vk-header-bg: rgba(255, 255, 255, 0.04);
+  --vk-username: #6b9ce6;
+  --vk-message-bg: #2d2d44;
+  --vk-input-bg: #2d2d44;
+  --vk-border: rgba(255, 255, 255, 0.08);
+  --vk-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  --vk-badge-mod: #f0a030;
+  --vk-badge-admin: #e74c3c;
+
+  background: var(--vk-bg);
+  color: var(--vk-text);
+  border-radius: 20px;
+  box-shadow: var(--vk-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 400px;
+  max-height: 600px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  border: 1px solid var(--vk-border);
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+
+/* --- Шапка --- */
+.chat-header {
+  padding: 14px 20px;
+  background: var(--vk-header-bg);
+  border-bottom: 1px solid var(--vk-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.vk-icon {
+  font-size: 22px;
+}
+.platform-name {
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.3px;
+  color: var(--vk-username);
+}
+.live-badge {
+  background: #e74c3c;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: pulse 1.8s infinite;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.viewers-count {
+  font-size: 14px;
+  opacity: 0.7;
+}
+.settings-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.settings-btn:hover {
+  opacity: 1;
+}
+
+/* --- Сообщения --- */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  scroll-behavior: smooth;
+  min-height: 0;
+}
+.chat-messages::-webkit-scrollbar {
+  width: 4px;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(107, 156, 230, 0.4);
+  border-radius: 8px;
+}
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* --- Сообщение --- */
+.message-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 2px 0;
+}
+.message-item.same-user {
+  margin-top: -2px;
+}
+.message-item.same-user .message-meta .username {
+  font-weight: 400;
+  opacity: 0.7;
+}
+.message-item.same-user .avatar-placeholder {
+  width: 32px;
+  flex-shrink: 0;
+}
+
+/* Аватар */
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #6b9ce6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+.avatar-placeholder {
+  width: 32px;
+  flex-shrink: 0;
+}
+
+/* Тело */
+.message-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.username {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--vk-username);
+  word-break: break-word;
+}
+.message-time {
+  font-size: 10px;
+  opacity: 0.5;
+  font-weight: 400;
+}
+.mod-badge {
+  font-size: 9px;
+  background: var(--vk-badge-mod);
+  color: #fff;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.admin-badge {
+  font-size: 9px;
+  background: var(--vk-badge-admin);
+  color: #fff;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.message-text {
+  font-size: 14px;
+  line-height: 1.4;
+  word-break: break-word;
+  background: var(--vk-message-bg);
+  padding: 6px 14px 6px 12px;
+  border-radius: 16px 16px 16px 4px;
+  display: inline-block;
+  max-width: 95%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--vk-border);
+}
+.like-icon {
+  margin-left: 4px;
+  font-size: 14px;
+}
+
+/* --- Поле ввода --- */
+.chat-input-area {
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--vk-border);
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.chat-input {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid var(--vk-border);
+  border-radius: 30px;
+  background: var(--vk-input-bg);
+  color: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.chat-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+.chat-input:focus {
+  border-color: #6b9ce6;
+}
+.send-btn {
+  background: #6b9ce6;
+  border: none;
+  color: #fff;
+  width: 40px;
+  border-radius: 30px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.send-btn:hover {
+  background: #4f7fc4;
+  transform: scale(1.04);
+}
+
+/* --- Анимация LIVE --- */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* --- Адаптивность --- */
+@media (max-width: 480px) {
+  .vklive-chat-widget {
+    border-radius: 16px;
+    min-height: 300px;
+    max-height: 450px;
+  }
+  .chat-header {
+    padding: 12px 14px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .platform-name {
+    font-size: 16px;
+  }
+  .chat-messages {
+    padding: 12px 14px;
+  }
+  .message-text {
+    font-size: 13px;
+  }
+  .chat-input-area {
+    padding: 8px 14px 12px;
+  }
+}
+
+:global(.theme-light) .vklive-chat-widget {
+  --vk-bg: #f5f6fa;
+  --vk-text: #1a1a2e;
+  --vk-header-bg: rgba(0, 0, 0, 0.03);
+  --vk-username: #2d6bb8;
+  --vk-message-bg: #ffffff;
+  --vk-input-bg: #ffffff;
+  --vk-border: rgba(0, 0, 0, 0.08);
+  --vk-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --vk-badge-mod: #ffa000;
+  --vk-badge-admin: #e74c3c;
+}
+:global(.theme-light) .vklive-chat-widget .chat-input::placeholder {
+  color: rgba(0, 0, 0, 0.2);
+}
+:global(.theme-light) .vklive-chat-widget .chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(45, 107, 184, 0.3);
+}
+:global(.theme-light) .vklive-chat-widget .send-btn {
+  background: #2d6bb8;
+}
+:global(.theme-light) .vklive-chat-widget .send-btn:hover {
+  background: #1f4f8a;
+}
+:global(.theme-light) .vklive-chat-widget .avatar {
+  background: #2d6bb8;
+}
+:global(.theme-light) .vklive-chat-widget .message-text {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}

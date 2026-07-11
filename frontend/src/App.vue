@@ -32,12 +32,8 @@ const currentPageId = computed(() => buttons.value.currentPage);
     <main class="workspace">
       <TopBar />
       <section class="content-grid">
-          <div class="chat-area">
-            <div class="chat-grid">
-                <div v-if="!pageComponents[currentPageId]">Нет компонента для страницы {{ currentPageId }}</div>
-                <component v-else :is="pageComponents[currentPageId]" />
-            </div>
-          </div>
+        <div v-if="!pageComponents[currentPageId]">Нет компонента для страницы {{ currentPageId }}</div>
+        <component v-else :is="pageComponents[currentPageId]" />
         <!-- <aside class="restore-panel">
           <h3>Удалённые окна</h3>
           <p class="restore-help">Возвращайте любое окно обратно в список чатов.</p>
