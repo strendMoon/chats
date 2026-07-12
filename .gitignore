@@ -4,7 +4,7 @@ jspm_packages/
 __pycache__/
 venv/
 .vscode/
-
+client_secret_929337183833-ti9l09r4uktgd6a811kjq6tfe8c3m2ep.apps.googleusercontent.com.json
 # Папки сборки (билды)
 dist/
 build/

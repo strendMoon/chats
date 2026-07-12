@@ -12,8 +12,6 @@
         <button class="settings-btn" title="Настройки">⚙️</button>
       </div>
     </div>
-
-    <!-- Область сообщений с прокруткой -->
     <div class="chat-messages" ref="messagesContainer">
       <div
         v-for="(message, index) in youTube_chat_widgets[0]?.messages || []"
@@ -23,7 +21,7 @@
           'same-user': index > 0 && message.name === youTube_chat_widgets[0].messages[index - 1].name
         }"
       >
-        <!-- Аватарка (только если сообщение от нового пользователя) -->
+
         <div v-if="!sameUser(index)" class="avatar">
           {{ getInitials(message.name) }}
         </div>
@@ -88,10 +86,10 @@ const youTube_chat_widgets = ref([
   },
 ])
 
-// Ссылка на контейнер для автоматического скролла
+
 const messagesContainer = ref(null)
 
-// Функция для получения инициалов (для аватарки)
+
 const getInitials = (name) => {
   return name
     .split(' ')
@@ -101,14 +99,14 @@ const getInitials = (name) => {
     .slice(0, 2)
 }
 
-// Проверка, что текущее сообщение от того же пользователя, что и предыдущее
+
 const sameUser = (index) => {
   const messages = youTube_chat_widgets.value[0]?.messages || []
   if (index === 0) return false
   return messages[index].name === messages[index - 1].name
 }
 
-// Автоматическая прокрутка вниз при добавлении новых сообщений
+
 watch(
   () => youTube_chat_widgets.value[0]?.messages.length,
   () => {
