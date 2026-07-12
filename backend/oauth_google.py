@@ -34,6 +34,7 @@ def generate_youtube_oauth_redirect_url(state: str = "youtube") -> str:
             # "https://www.googleapis.com/auth/dataportability.youtube.subscriptions",
             # "https://www.googleapis.com/auth/dataportability.youtube.comments",
             "https://www.googleapis.com/auth/youtube",
+            "https://www.googleapis.com/auth/youtube.readonly",
             "https://www.googleapis.com/auth/youtube.force-ssl",
             "https://www.googleapis.com/auth/youtube.upload",
             "https://www.googleapis.com/auth/youtubepartner",

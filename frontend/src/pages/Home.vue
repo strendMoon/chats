@@ -37,6 +37,67 @@
     </div>
 
     <div v-if="statusMessage" class="status-message">{{ statusMessage }}</div>
+
+    <div v-if="user" class="info-grid">
+      <section class="panel">
+        <h3>Профиль</h3>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Имя:</strong> {{ user.name || '—' }}</p>
+        <p><strong>Google ID:</strong> {{ user.google_id || '—' }}</p>
+      </section>
+
+      <section class="panel">
+        <h3>YouTube канал</h3>
+        <div v-if="user.youtube?.connected && user.youtube?.channel">
+          <p><strong>Название:</strong> {{ user.youtube.channel.snippet?.title || '—' }}</p>
+          <p><strong>Подписчики:</strong> {{ user.youtube.channel.statistics?.subscriberCount || '—' }}</p>
+          <p><strong>Просмотры:</strong> {{ user.youtube.channel.statistics?.viewCount || '—' }}</p>
+          <p><strong>Видео:</strong> {{ user.youtube.channel.statistics?.videoCount || '—' }}</p>
+        </div>
+        <div v-else-if="user.youtube?.connected">
+          <p>Канал ещё не доступен или токен не дал прав на чтение.</p>
+        </div>
+        <div v-else>
+          <p>YouTube не подключён.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>Текущая трансляция</h3>
+        <div v-if="user.youtube?.stream">
+          <p class="live-pill" :class="{ live: user.youtube.stream.status?.lifeCycleStatus === 'live', offline: user.youtube.stream.status?.lifeCycleStatus !== 'live' }">
+            {{ user.youtube.stream.status?.lifeCycleStatus === 'live' ? 'В прямом эфире' : 'Оффлайн' }}
+          </p>
+          <p><strong>Заголовок:</strong> {{ user.youtube.stream.snippet?.title || '—' }}</p>
+          <p><strong>Статус:</strong> {{ user.youtube.stream.status?.lifeCycleStatus || '—' }}</p>
+          <p><strong>Live Chat ID:</strong> {{ user.youtube.stream.contentDetails?.liveChatId || '—' }}</p>
+          <p><strong>Начало:</strong> {{ user.youtube.stream.snippet?.publishedAt || '—' }}</p>
+          <p><strong>Конфиденциальность:</strong> {{ user.youtube.stream.status?.privacyStatus || '—' }}</p>
+        </div>
+        <div v-else>
+          <p>Активная трансляция не найдена.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>Чат прямой трансляции</h3>
+        <div v-if="user.youtube?.live_chat?.messages?.length">
+          <ul class="chat-list">
+            <li v-for="(message, index) in user.youtube.live_chat.messages.slice(0, 8)" :key="index">
+              <strong>{{ message.authorDetails?.displayName || 'Аноним' }}:</strong>
+              {{ message.snippet?.displayMessage || '—' }}
+            </li>
+          </ul>
+        </div>
+        <div v-else>
+          <p>{{ user.youtube?.live_chat?.reason || 'Сообщения чата пока отсутствуют.' }}</p>
+        </div>
+        <p v-if="user.youtube?.error" class="warning">{{ user.youtube.error }}</p>
+        <a v-if="user.youtube?.live_chat_url" :href="user.youtube.live_chat_url" target="_blank" rel="noopener" class="chat-link">
+          Открыть чат в YouTube Studio
+        </a>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -47,11 +108,18 @@ export default {
       loading: true,
       user: null,
       statusMessage: '',
+      pollingTimer: null,
     }
   },
   mounted() {
     this.fetchUser()
+    this.pollingTimer = setInterval(() => this.fetchUser(), 15000)
     this.$watch('$route.query', () => this.fetchUser(), { deep: true })
+  },
+  beforeUnmount() {
+    if (this.pollingTimer) {
+      clearInterval(this.pollingTimer)
+    }
   },
   methods: {
     async fetchUser() {
@@ -97,6 +165,10 @@ export default {
         vk: 'VK Live',
       }[provider] || provider
 
+      if (this.$route?.query?.auth_error) {
+        return `Ошибка подключения ${label}: ${this.$route.query.auth_error}`
+      }
+
       return `Подключено: ${label}`
     },
     async logout() {
@@ -141,6 +213,15 @@ export default {
 .provider-btn.vk { background: #0077ff; }
 .providers-status { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 1rem; color: #455a64; }
 .status-message { margin-top: 0.75rem; padding: 0.75rem 1rem; border-radius: 12px; background: #e8f5e9; color: #2e7d32; font-weight: 600; }
+.info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; }
+.panel { padding: 1rem; border-radius: 16px; background: #f8faff; }
+.panel h3 { margin-top: 0; margin-bottom: 0.75rem; }
+.live-pill { display: inline-block; margin-bottom: 0.75rem; padding: 0.35rem 0.7rem; border-radius: 999px; font-weight: 700; }
+.live-pill.live { background: #e8f5e9; color: #2e7d32; }
+.live-pill.offline { background: #eceff5; color: #546e7a; }
+.chat-list { padding-left: 1rem; display: grid; gap: 0.5rem; }
+.chat-link { display: inline-block; margin-top: 0.75rem; color: #ff0000; font-weight: 600; text-decoration: none; }
+.warning { color: #c62828; font-size: 0.95rem; }
 .btn { border: none; border-radius: 999px; padding: 0.8rem 1.2rem; cursor: pointer; font-weight: 600; }
 .btn-primary { background: #4285f4; color: white; }
 .btn-secondary { background: #eceff5; color: #263238; }

@@ -1,9 +1,10 @@
+import asyncio
 import urllib.parse
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse, RedirectResponse
 
-from auth_service import exchange_code_for_token, fetch_google_user_info
+from auth_service import exchange_code_for_token, fetch_google_user_info, fetch_youtube_data
 from auth_utils import create_access_token, decode_access_token
 from config import settings
 from database import get_user_by_google_id, get_user_by_id, upsert_user
@@ -125,8 +126,46 @@ async def youtube_callback(code: str | None = None, state: str | None = None, re
     return RedirectResponse(url=_build_frontend_redirect(None, state, provider="youtube", success=True), status_code=302)
 
 
+@router.websocket("/youtube/live")
+async def youtube_live_websocket(websocket: WebSocket):
+    await websocket.accept()
+
+    token = websocket.cookies.get("access_token")
+    if not token:
+        await websocket.close(code=1008)
+        return
+
+    payload = decode_access_token(token)
+    if not payload:
+        await websocket.close(code=1008)
+        return
+
+    user = get_user_by_id(int(payload["sub"]))
+    if not user or not user.get("youtube_access_token"):
+        await websocket.close(code=1008)
+        return
+
+    try:
+        while True:
+            try:
+                youtube_data = await fetch_youtube_data(user["youtube_access_token"])
+            except Exception as exc:
+                youtube_data = {
+                    "connected": True,
+                    "channel": None,
+                    "stream": None,
+                    "live_chat": None,
+                    "error": str(exc),
+                }
+
+            await websocket.send_json({"type": "youtube_update", "payload": youtube_data})
+            await asyncio.sleep(10)
+    except WebSocketDisconnect:
+        return
+
+
 @router.get("/me")
-def me(request: Request):
+async def me(request: Request):
     token = request.cookies.get("access_token")
     if not token:
         return JSONResponse({"authenticated": False}, status_code=401)
@@ -138,6 +177,25 @@ def me(request: Request):
     user = get_user_by_id(int(payload["sub"]))
     if not user:
         return JSONResponse({"authenticated": False}, status_code=401)
+
+    youtube_data = {
+        "connected": bool(user.get("youtube_access_token")),
+        "channel": None,
+        "stream": None,
+        "live_chat": None,
+        "error": None,
+    }
+    if user.get("youtube_access_token"):
+        try:
+            youtube_data = await fetch_youtube_data(user["youtube_access_token"])
+        except Exception as exc:
+            youtube_data = {
+                "connected": True,
+                "channel": None,
+                "stream": None,
+                "live_chat": None,
+                "error": str(exc),
+            }
 
     safe_user = {
         "id": user["id"],
@@ -151,6 +209,7 @@ def me(request: Request):
             "twitch": bool(user.get("twitch_access_token")),
             "vk": bool(user.get("vk_access_token")),
         },
+        "youtube": youtube_data,
     }
     return JSONResponse({"authenticated": True, "user": safe_user})
 
